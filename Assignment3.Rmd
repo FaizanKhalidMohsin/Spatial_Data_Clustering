@@ -1,0 +1,51 @@
+---
+title: "Assignment 3 UTM Geography"
+author: "Faizan Khalid Mohsin"
+date: "April 3, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+##Introduction
+
+The third and ﬁnal assignment in our course is diﬀerent from assignment one or two. In assignment three, you are provided with a geojson that contains Ecodistricts with a number of environmental and hydrological variables, and you are required to determine the approach to address the following research question. The format of the assignment is a report.
+
+###Research Question
+Identify 3 spatially-contiguous clusters of Ecodistricts in the St. Lawrence River Basin. The purpose of this work is to identify Ecodistrict clusters based on environmental and hydrological conditions that are associated with stream ﬂow. This analysis is being conducted to identify three clusters that will each receive a new water ﬂow gauge in one of their rivers.
+
+```{r data}
+
+# Reading in the data
+
+require(geojsonio)
+require(leaflet)
+data = readOGR("ecodistricts.geojson")
+class(data)
+
+pal <- colorNumeric("viridis", NULL)
+
+leaflet(data = data) %>% addTiles() %>% addPolygons()
+
+leaflet(data) %>%
+  addTiles() %>%
+  addPolygons(stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1,
+    fillColor = ~pal(log10(pop)),
+    label = ~paste0(county, ": ", formatC(pop, big.mark = ","))) %>%
+  addLegend(pal = pal, values = ~log10(pop), opacity = 1.0,
+    labFormat = labelFormat(transform = function(x) round(10^x)))
+
+
+library(rgdal)
+
+# From https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html
+states <- readOGR("shp/cb_2013_us_state_20m.shp",
+  layer = "cb_2013_us_state_20m", GDAL1_integer64_policy = TRUE)
+
+```
+
+
+END
